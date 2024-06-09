@@ -10,21 +10,26 @@ class Twenty20(RefresherClient):
         2020 hack attempt
     """
     REGISTRATION_PHRASE = "Please enter your registration details"
+    HOLDING_PHRASE = "Event is Found"
 
-    def _refreshcheck(self, url, phrases_to_check):
+    def _refreshcheck(self, url, phrases_to_check, phrases_to_check_not):
         def isregistration(content):
             condition = False
             for p in phrases_to_check:
                 if p in content.get_attribute("innerHTML"):
                     condition = True
+            for p in phrases_to_check_not:
+                if p not in content.get_attribute("innerHTML"):
+                    condition = True
             return condition
 
         try:
-            self.content = self.client.find_element_by_tag_name('body')
+            self.content = self.client.find_element("tag name", "body") #find_element_by_tag_name('body')
             # _ = self.client.find_element_by_tag_name('h1')
             # self.content = self.client.find_element_by_class_name(
             #     'entry-content')
-        except:
+        except Exception as e:
+            print("error: {}".format(e))
             print(
                 "Incorrect html format found. Is the URL as expected? URL: {}".format(url))
             return
@@ -40,13 +45,16 @@ class Twenty20(RefresherClient):
             # self.client.get(url)
             # this seems quicker
             # I think there may be a reason why I did not use this before
+            print("Refreshing...")
             self.client.refresh()
+            print("Refreshed...")
             try:
-                self.content = self.client.find_element_by_tag_name('body')
+                self.content = self.client.find_element("tag name", "body")
                 # self.content = self.client \
                 #     .find_element_by_xpath("//*[contains(text(), '{}')]".format(REGISTRATION_PHRASE))
-            except:
-                continue
+            except Exception as e:
+                print("error: {}".format(e))
+                print("could not find element from content")
 
         self.content = self.pagesource
         # self.client.save_screenshot('./screenshots/registrationpage.png')

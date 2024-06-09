@@ -1,8 +1,5 @@
 import time
 from selenium import webdriver
-# use as a service to save start up and close down effort for many instances
-import selenium.webdriver.chrome.service as service
-import selenium.webdriver.chrome.options as options
 
 
 class Service(object):
@@ -10,11 +7,12 @@ class Service(object):
         Wraps the selenium service
     """
 
-    def __init__(self, chromedriver):
-        self._driver = chromedriver
-        self.service = service.Service(chromedriver)
-        self.service.start()
-        self.options = options.Options()
+    def __init__(self):
+        # driver = webdriver.Firefox()
+        # self._driver = driver
+        self.service = webdriver.FirefoxService()
+        #self.service.start()
+        self.options = webdriver.FirefoxOptions()
 
     def url(self):
         return self.service.service_url
@@ -54,8 +52,8 @@ class Client(object):
         if cache:
             prefs['disk-cache-size'] = cache
 
-        if prefs:
-            self._service.options.add_experimental_option( "prefs", prefs)
+        # if prefs:
+        #     self._service.options.add_experimental_option( "prefs", prefs)
 
         if proxy:
             self._service.options.add_argument("--proxy-server={}".format(proxy))
@@ -67,17 +65,27 @@ class Client(object):
             self._service.options.add_argument("--headless")
 
     def establishconnection(self, url, scalefactor=1.1,
-                            mintimeout=1.0, maxiterations=1000, phrases_to_check=[]):
+                            mintimeout=1.0, maxiterations=1000, phrases_to_check=[], phrases_to_check_not=[]):
         self.attempts = 0
         while self.attempts < maxiterations:
-            self.client = webdriver.Remote(self._service.url(), options=self._service.options)
+            print("attempting connection")
+            print(self._service.url())
+            print(self._service.options)
+            #self.client = webdriver.Remote(self._service.url(), options=self._service.options)
+            self.client = webdriver.Firefox(service=self._service.service, options=self._service.options)#options=self._service.options)
+            print("attempting connection1")
             self.client.set_page_load_timeout(self.timeout)
-            try:
+            try:    
+                print("attempting connection2")
                 self.client.get(url)
+                print("attempting connection3")
                 self.content = self.client.page_source
-                self._refreshcheck(url, phrases_to_check)
+                print("attempting connection4")
+                self._refreshcheck(url, phrases_to_check, phrases_to_check_not)
+                print("attempting connection5")
                 return True
-            except:
+            except Exception as e:
+                print("error: {}".format(e))
                 self.timeout = max(self.timeout*scalefactor, mintimeout)
                 if self.verbose:
                     print("Page load Timeout Occured. Increasing timeout to {} and trying again....".format(

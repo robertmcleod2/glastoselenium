@@ -2,6 +2,27 @@
 
 ### A python bot for booking glasto tickets
 
+## Robert Fork 2024
+
+1. Installation
+
+``` bash
+conda create -n glasto-env python=3.10
+conda activate glasto-env
+pip install -r requirements.txt
+python setup.py install
+```
+
+2. Install Firefox Browser: https://www.mozilla.org/en-GB/firefox/new/ 
+
+3. Run glasto2024 script
+
+``` bash
+python scripts/glasto2024.py
+```
+
+
+
 <b>UPDATE March, 2022: I am getting a lot of emails about this recently, hence this update.
 I no longer have time nor interest in maintaining this any longer, it is too hard to test, given that I never really know what the website will look like until the sale.
 In addition the interest in tickets is just too high, and getting through to the site, even with multiple bots and machines, is just too damn hard and not worth the hassle.
